@@ -3,21 +3,7 @@ const input = document.getElementById('desc');
 const itemsEl = document.getElementById('items');
 const clearBtn = document.getElementById('clear');
 
-const STORAGE_KEY = 'receipt:entries';
-
-function load() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  } catch {
-    return [];
-  }
-}
-
-function save(entries) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-}
-
-let entries = load();
+let entries = [];
 
 function escapeHtml(s) {
   return s.replace(/[&<>"']/g, (c) => ({
@@ -109,7 +95,6 @@ async function add(text) {
     ? 1
     : randomQty();
   entries.push({ qty, text: display });
-  save(entries);
   render();
 }
 
@@ -128,7 +113,6 @@ clearBtn.addEventListener('click', () => {
   if (entries.length === 0) return;
   if (!confirm('모든 항목을 지울까요?')) return;
   entries = [];
-  save(entries);
   render();
 });
 
