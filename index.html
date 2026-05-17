@@ -34,14 +34,24 @@
 
       <ul class="items" id="items"></ul>
 
+      <button type="button" class="btn-settle" id="settle">CONFIRM</button>
+
       <div class="rule"></div>
 
       <div class="total">
         <span>TOTAL</span>
-        <span>$0.00</span>
+        <span id="total-amount">$0.00</span>
       </div>
 
-      <p class="footer-note">You'll never settle the bill.<br />but you can worship God<br /><br />at &ldquo;Countdownl 2026.&rdquo;</p>
+      <p class="footer-note">You'll never settle the bill.<br />but you can praise God<br /><br />at &ldquo;Countdown 2026.&rdquo;</p>
+
+      <a
+        class="visit-btn"
+        id="visit-btn"
+        href="https://www.countdown2026.org/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >VISIT COUNTDOWN 2026 →</a>
     </article>
   </main>
 
@@ -49,13 +59,15 @@
     <input
       id="desc"
       type="text"
-      placeholder="여기에 입력하고 Enter..."
+      placeholder="What God has done for me"
       maxlength="80"
       autofocus
     />
     <button type="submit" aria-label="추가">＋</button>
     <button type="button" id="clear" aria-label="모두 지우기">↺</button>
   </form>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="script.js"></script>
 </body>
