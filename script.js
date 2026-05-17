@@ -314,7 +314,13 @@ async function add(text) {
       isSpecific = !!result.isSpecific;
     } catch (err) {
       console.error(err);
-      display = trimmed; // fallback to original
+      // API 실패 시 한국어 노출 방지 — 안전 풀에서 랜덤 응답으로 대체
+      display = randomMeaninglessPhrase();
+      oncePerLife = false;
+      isPartner = false;
+      isInfinite = false;
+      isFamilyLove = false;
+      isSpecific = false;
     }
   }
 
