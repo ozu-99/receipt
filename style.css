@@ -237,11 +237,38 @@ body {
 }
 .items .item .amt {
   text-align: right;
+}
+
+/* 입력 단계 — x 버튼만 보임, $0.00 숨김 */
+.items .item .amt-x {
+  background: none;
+  border: none;
+  padding: 0 2px;
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.items .item .amt-x:hover {
+  color: var(--ink);
+}
+
+.items .item .amt-val {
+  display: none;
   opacity: 0;
   transition: opacity 0.25s ease-out;
 }
 
-.items .item .amt.shown {
+/* settle 진행 시 — x 사라지고 $0.00 표시 */
+.items .item .amt.shown .amt-x {
+  display: none;
+}
+
+.items .item .amt.shown .amt-val {
+  display: inline;
   opacity: 1;
 }
 
@@ -313,6 +340,35 @@ body {
   display: none;
 }
 
+/* CONFIRM 아래의 CLEAR (입력 단계 reset) — 작은 텍스트 링크 스타일 */
+.btn-reset {
+  display: block;
+  width: 100%;
+  margin: 4px 0 0;
+  padding: 6px 0;
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.btn-reset:hover {
+  color: var(--ink);
+}
+
+.receipt.settling .btn-reset,
+.receipt.settled .btn-reset,
+.btn-reset.hidden-empty {
+  display: none;
+}
+
 /* ---------- Footer (기본 숨김, settled 시 노출) ---------- */
 .rule,
 .total,
@@ -334,7 +390,7 @@ body {
   font-size: 16px;
   letter-spacing: 1px;
   padding: 4px 0;
-  margin-bottom: 50px;
+  margin-bottom: 40px;
   animation: pop 0.3s ease-out;
 }
 
@@ -345,52 +401,10 @@ body {
   font-size: 12px;
   color: var(--ink-soft);
   margin-top: 18px;
-  letter-spacing: 0.5px;
-}
-
-/* 번역 토글 버튼 — footer 타이핑 후 등장 (작은 링크 스타일) */
-.translate-toggle {
-  display: none;
-  margin: 14px auto 30px;
-  padding: 4px 8px;
-  background: none;
-  border: none;
-  color: var(--ink-soft);
-  font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
-  font-size: 11px;
-  letter-spacing: 0.5px;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
-  transition: color 0.15s;
-}
-
-.translate-toggle.shown {
-  display: block;
-  animation: pop 0.3s ease-out;
-}
-
-.translate-toggle:hover {
-  color: var(--ink);
-}
-
-/* 한국어 번역 본문 (토글 시 노출) */
-.footer-note-ko {
-  display: none;
-  text-align: center;
-  font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
-  font-size: 12px;
-  color: var(--ink-soft);
-  margin-top: 10px;
   margin-bottom: 30px;
-  letter-spacing: 0.2px;
-  line-height: 1.7;
+  letter-spacing: 0.5px;
 }
 
-.footer-note-ko.shown {
-  display: block;
-  animation: pop 0.35s ease-out;
-}
 
 /* Visit Countdown 2026 버튼 — footer 타이핑 후 등장 (검정 박스) */
 .visit-btn {
@@ -450,7 +464,8 @@ body {
 .composer {
   position: fixed;
   left: 50%;
-  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  /* 모바일 키보드 올라올 때 visualViewport 변화량(--kb-offset)만큼 위로 밀어올림 */
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px) + var(--kb-offset, 0px));
   transform: translateX(-50%);
   width: min(420px, calc(100% - 32px));
   display: flex;

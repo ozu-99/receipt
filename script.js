@@ -1,5 +1,22 @@
 const form = document.getElementById('form');
 const input = document.getElementById('desc');
+
+// 모바일 키보드 올라올 때 입력창(composer)을 visualViewport 하단에 고정
+// (interactive-widget=resizes-content를 지원 안 하는 iOS Safari 등 폴백)
+if (window.visualViewport) {
+  const updateComposerOffset = () => {
+    const vv = window.visualViewport;
+    const keyboardOffset = window.innerHeight - vv.height - vv.offsetTop;
+    // CSS 변수로 노출 → composer가 bottom 계산에 활용
+    document.documentElement.style.setProperty(
+      '--kb-offset',
+      `${Math.max(0, keyboardOffset)}px`
+    );
+  };
+  window.visualViewport.addEventListener('resize', updateComposerOffset);
+  window.visualViewport.addEventListener('scroll', updateComposerOffset);
+  updateComposerOffset();
+}
 const itemsEl = document.getElementById('items');
 const clearBtn = document.getElementById('clear');
 const settleBtn = document.getElementById('settle');
@@ -10,8 +27,6 @@ const footerNoteOriginalHTML = footerNoteEl.innerHTML;
 const totalAmountEl = document.getElementById('total-amount');
 const visitBtn = document.getElementById('visit-btn');
 const restartBtn = document.getElementById('restart-btn');
-const translateToggle = document.getElementById('translate-toggle');
-const footerNoteKo = document.getElementById('footer-note-ko');
 
 
 // money 효과음 (TOTAL $0.00 안착 시 1회 재생)
@@ -82,13 +97,6 @@ function typeFooterNote(perChar = 55) {
     if (i >= text.length) {
       // 마지막 글자 입력 후 커서 1번 정도 깜빡 (0.8초) 뒤 제거
       revealTimers.push(setTimeout(() => cursor.remove(), 800));
-      // 1초 뒤 → 번역 토글 버튼 등장
-      revealTimers.push(
-        setTimeout(() => {
-          translateToggle.classList.add('shown');
-          scrollIfHidden(translateToggle);
-        }, 1000)
-      );
       // 2초 뒤 → Visit 버튼 등장
       revealTimers.push(
         setTimeout(() => {
@@ -162,19 +170,49 @@ function highlightCountdown(safeHtml) {
   );
 }
 
+// 모바일 감지 — 화면 너비 기준 (600px 미만)
+const mobileMQL = window.matchMedia('(max-width: 600px)');
+let isMobile = mobileMQL.matches;
+mobileMQL.addEventListener('change', (e) => {
+  isMobile = e.matches;
+  render(); // 뷰포트 바뀌면 다시 렌더
+});
+
+// description 텍스트 — 모바일에서 "동사 + you" 패턴이면 첫 줄을 그렇게 끊고 나머지는 자동 줄바꿈
+function formatDescription(text) {
+  if (!isMobile) return highlightCountdown(escapeHtml(text));
+  const words = text.split(/\s+/).filter(Boolean);
+  // 두 번째 단어가 정확히 "you"면 첫 줄 = "동사 you", 나머지 줄
+  if (words.length > 2 && words[1] === 'you') {
+    const first = words.slice(0, 2).join(' ');
+    const rest = words.slice(2).join(' ');
+    return (
+      highlightCountdown(escapeHtml(first)) +
+      '<br />' +
+      highlightCountdown(escapeHtml(rest))
+    );
+  }
+  return highlightCountdown(escapeHtml(text));
+}
+
 function render() {
   itemsEl.innerHTML = entries
     .map(
-      (e) => `
+      (e, idx) => `
       <li class="item">
         <span class="qty${e.qty === '∞' ? ' qty-inf' : ''}">${e.qty == null ? '-' : e.qty}</span>
-        <span class="desc">${highlightCountdown(escapeHtml(e.text))}</span>
-        <span class="amt">$0.00</span>
+        <span class="desc">${formatDescription(e.text)}</span>
+        <span class="amt">
+          <button type="button" class="amt-x" data-idx="${idx}" aria-label="삭제">×</button>
+          <span class="amt-val">$0.00</span>
+        </span>
       </li>`
     )
     .join('');
-  // 항목이 하나도 없으면 CONFIRM 버튼 숨김
-  settleBtn.classList.toggle('hidden-empty', entries.length === 0);
+  // 항목이 하나도 없으면 CONFIRM / RESTART 버튼 둘 다 숨김
+  const empty = entries.length === 0;
+  settleBtn.classList.toggle('hidden-empty', empty);
+  clearBtn.classList.toggle('hidden-empty', empty);
   // 자동 스크롤 제거 — 사용자가 화면 첫 부분을 그대로 볼 수 있게
 }
 
@@ -190,14 +228,39 @@ function hasKorean(text) {
   return /[ㄱ-힝]/.test(text);
 }
 
-// 의미있는 텍스트 판별: 한글 음절(가~힣) 1자 이상 OR 영어 알파벳 2자 이상 연속
-// 그 외(자모 단독, 단일 영문자, 특수기호/숫자만)는 모두 "의미 없음"으로 간주
+// 의미있는 텍스트 판별
+// - 한글 음절(가~힣) 있으면 의미있음
+// - 영어 알파벳은 단순 2자 이상으로 안 됨: 모음 + 키보드 mash 패턴 검사
+// - 자모, 단일 영문자, 특수기호/숫자만, 키보드 mash, 모음 없는 자음 나열 → 의미 없음
 function isMeaningless(text) {
   const t = text.trim();
   if (!t) return true;
   if (/[가-힣]/.test(t)) return false;
-  if (/[A-Za-z]{2,}/.test(t)) return false;
-  return true;
+
+  const asciiTokens = t.match(/[A-Za-z]+/g) || [];
+  if (asciiTokens.length === 0) return true; // ASCII도 없음 (자모/숫자/기호만)
+
+  const longest = asciiTokens.reduce((a, b) => (a.length > b.length ? a : b));
+  if (longest.length < 2) return true;                  // 1글자 단어
+  if (!/[aeiouyAEIOUY]/.test(longest)) return true;     // 모음 없는 자음 나열
+
+  // 키보드 행 mash (qwerty / asdf / zxcv / 양방향)
+  if (/qwer|wert|erty|rtyu|tyui|yuio|uiop|asdf|sdfg|dfgh|fghj|ghjk|hjkl|zxcv|xcvb|cvbn|vbnm|qaz|wsx|edc|rfv/i.test(longest)) return true;
+  if (/rewq|trew|ytre|uytr|iuyt|oiuy|poiu|fdsa|gfds|hgfd|jhgf|kjhg|lkjh|vcxz|bvcx|nbvc|mnbv/i.test(longest)) return true;
+
+  // 같은 글자 4번 이상 연속 ("aaaa", "Helllllo")
+  if (/(.)\1{3,}/.test(longest)) return true;
+
+  // 알파벳 순차 4글자 이상 ("abcd", "wxyz")
+  if (/abcd|bcde|cdef|defg|efgh|fghi|ghij|hijk|ijkl|jklm|klmn|lmno|mnop|nopq|opqr|pqrs|qrst|rstu|stuv|tuvw|uvwx|vwxy|wxyz/i.test(longest)) return true;
+
+  // 5자 이상인데 모음 비율 너무 낮음 (< 25%) — "bcdfg", "mngrt" 같은 자음 위주 mash
+  if (longest.length >= 5) {
+    const vowelCount = (longest.match(/[aeiouyAEIOUY]/g) || []).length;
+    if (vowelCount / longest.length < 0.25) return true;
+  }
+
+  return false;
 }
 
 // 의미없는 입력에 대한 응답 풀 — 짧고 신의 시점, 영수증 한 줄에 어울리는 톤
@@ -386,12 +449,9 @@ function resetSettled() {
   footerNoteEl.innerHTML = footerNoteOriginalHTML;
   // total 금액도 초기값으로
   totalAmountEl.textContent = '$0.00';
-  // visit / restart / 번역 토글 숨김 + 번역 본문도 닫기
+  // visit / restart 버튼 숨김
   visitBtn.classList.remove('shown');
   restartBtn.classList.remove('shown');
-  translateToggle.classList.remove('shown');
-  translateToggle.textContent = '번역 보기';
-  footerNoteKo.classList.remove('shown');
 }
 
 let submitInFlight = false;
@@ -412,6 +472,18 @@ form.addEventListener('submit', async (e) => {
     input.focus();
     submitInFlight = false;
   }
+});
+
+// 항목 행의 x 버튼 클릭 → 해당 항목 삭제
+itemsEl.addEventListener('click', (e) => {
+  const target = e.target.closest('.amt-x');
+  if (!target) return;
+  // 결산 진행 중에는 삭제 불가
+  if (receiptEl.classList.contains('settling') || receiptEl.classList.contains('settled')) return;
+  const idx = parseInt(target.dataset.idx, 10);
+  if (Number.isNaN(idx)) return;
+  entries.splice(idx, 1);
+  render();
 });
 
 clearBtn.addEventListener('click', () => {
@@ -436,11 +508,6 @@ restartBtn.addEventListener('click', () => {
   input.focus();
 });
 
-translateToggle.addEventListener('click', () => {
-  const expanded = footerNoteKo.classList.toggle('shown');
-  translateToggle.textContent = expanded ? '번역 닫기' : '번역 보기';
-  if (expanded) scrollIfHidden(footerNoteKo);
-});
 
 settleBtn.addEventListener('click', () => {
   if (entries.length === 0) {

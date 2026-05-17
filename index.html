@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content" />
   <title>Receipt</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -35,6 +35,7 @@
       <ul class="items" id="items"></ul>
 
       <button type="button" class="btn-settle" id="settle">CONFIRM</button>
+      <button type="button" class="btn-reset" id="clear">CLEAR</button>
 
       <div class="rule"></div>
 
@@ -44,9 +45,6 @@
       </div>
 
       <p class="footer-note">You'll never settle the bill.<br />but you can praise God<br /><br />at &ldquo;Countdown 2026.&rdquo;</p>
-
-      <button type="button" class="translate-toggle" id="translate-toggle">번역 보기</button>
-      <p class="footer-note-ko" id="footer-note-ko">우리가 이 모든 값을 다 갚을 수는 없겠지만,<br />값없이 베풀어주신 하나님을 찬양할 수는 있습니다.</p>
 
       <a
         class="visit-btn"
@@ -69,7 +67,6 @@
       autofocus
     />
     <button type="submit" aria-label="추가">＋</button>
-    <button type="button" id="clear" aria-label="모두 지우기">↺</button>
   </form>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
