@@ -334,6 +334,7 @@ body {
   font-size: 16px;
   letter-spacing: 1px;
   padding: 4px 0;
+  margin-bottom: 50px;
   animation: pop 0.3s ease-out;
 }
 
@@ -347,15 +348,59 @@ body {
   letter-spacing: 0.5px;
 }
 
-/* Visit Countdown 2026 버튼 — footer 타이핑 후 등장 */
+/* 번역 토글 버튼 — footer 타이핑 후 등장 (작은 링크 스타일) */
+.translate-toggle {
+  display: none;
+  margin: 14px auto 30px;
+  padding: 4px 8px;
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.translate-toggle.shown {
+  display: block;
+  animation: pop 0.3s ease-out;
+}
+
+.translate-toggle:hover {
+  color: var(--ink);
+}
+
+/* 한국어 번역 본문 (토글 시 노출) */
+.footer-note-ko {
+  display: none;
+  text-align: center;
+  font-family: 'Pretendard Variable', Pretendard, -apple-system, sans-serif;
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-top: 10px;
+  margin-bottom: 30px;
+  letter-spacing: 0.2px;
+  line-height: 1.7;
+}
+
+.footer-note-ko.shown {
+  display: block;
+  animation: pop 0.35s ease-out;
+}
+
+/* Visit Countdown 2026 버튼 — footer 타이핑 후 등장 (검정 박스) */
 .visit-btn {
   display: none;
   width: 100%;
   margin-top: 20px;
   padding: 12px 0;
-  border: 1px dashed rgba(0, 0, 0, 0.45);
-  background: transparent;
-  color: var(--ink);
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
   text-decoration: none;
   text-align: center;
   font-family: inherit;
@@ -372,6 +417,20 @@ body {
 }
 
 .visit-btn:hover {
+  background: transparent;
+  color: var(--ink);
+}
+
+/* restart 버튼은 visit-btn 바로 아래, 외곽선만 있는 모양 */
+.restart-btn {
+  margin-top: 10px;
+  background: transparent;
+  color: var(--ink);
+  border: 1px dashed rgba(0, 0, 0, 0.45);
+  font-family: inherit;
+}
+
+.restart-btn:hover {
   background: var(--ink);
   color: var(--paper);
 }
@@ -427,22 +486,15 @@ body {
   height: 38px;
   border: none;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
+  background: #fff;
+  color: #000;
+  font-family: inherit;
   font-size: 18px;
+  font-weight: 700;
   cursor: pointer;
   transition: background 0.15s;
 }
 
 .composer button:hover {
-  background: rgba(255, 255, 255, 0.28);
-}
-
-.composer button[type='submit'] {
-  background: #fff;
-  color: #000;
-  font-weight: 700;
-}
-.composer button[type='submit']:hover {
   background: #e8e8e8;
 }

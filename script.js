@@ -9,6 +9,9 @@ const footerNoteEl = receiptEl.querySelector('.footer-note');
 const footerNoteOriginalHTML = footerNoteEl.innerHTML;
 const totalAmountEl = document.getElementById('total-amount');
 const visitBtn = document.getElementById('visit-btn');
+const restartBtn = document.getElementById('restart-btn');
+const translateToggle = document.getElementById('translate-toggle');
+const footerNoteKo = document.getElementById('footer-note-ko');
 
 
 // money 효과음 (TOTAL $0.00 안착 시 1회 재생)
@@ -79,12 +82,26 @@ function typeFooterNote(perChar = 55) {
     if (i >= text.length) {
       // 마지막 글자 입력 후 커서 1번 정도 깜빡 (0.8초) 뒤 제거
       revealTimers.push(setTimeout(() => cursor.remove(), 800));
-      // 2초 뒤 → Visit Countdown 2026 버튼 등장
+      // 1초 뒤 → 번역 토글 버튼 등장
+      revealTimers.push(
+        setTimeout(() => {
+          translateToggle.classList.add('shown');
+          scrollIfHidden(translateToggle);
+        }, 1000)
+      );
+      // 2초 뒤 → Visit 버튼 등장
       revealTimers.push(
         setTimeout(() => {
           visitBtn.classList.add('shown');
           scrollIfHidden(visitBtn);
         }, 2000)
+      );
+      // 그 1초 뒤 → Restart 버튼 등장
+      revealTimers.push(
+        setTimeout(() => {
+          restartBtn.classList.add('shown');
+          scrollIfHidden(restartBtn);
+        }, 3000)
       );
       return;
     }
@@ -363,33 +380,66 @@ function resetSettled() {
   receiptEl.classList.remove('settling', 'settled', 'settled-final');
   itemsEl.querySelectorAll('.amt.shown').forEach((el) => el.classList.remove('shown'));
   clearRevealTimers();
+  settleBtn.disabled = false;
+  restartBtn.disabled = false;
   // footer 텍스트도 원본으로 복구 (다음 결산 시 다시 타이핑됨)
   footerNoteEl.innerHTML = footerNoteOriginalHTML;
   // total 금액도 초기값으로
   totalAmountEl.textContent = '$0.00';
-  // visit 버튼 숨김
+  // visit / restart / 번역 토글 숨김 + 번역 본문도 닫기
   visitBtn.classList.remove('shown');
+  restartBtn.classList.remove('shown');
+  translateToggle.classList.remove('shown');
+  translateToggle.textContent = '번역 보기';
+  footerNoteKo.classList.remove('shown');
 }
 
+let submitInFlight = false;
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
+  if (submitInFlight) return;
   const value = input.value;
   if (!value.trim()) return;
+  submitInFlight = true;
   input.value = '';
   input.disabled = true;
   // 새 항목이 들어오면 결산 상태를 해제 (다시 입력 가능 상태로)
   resetSettled();
-  await add(value);
-  input.disabled = false;
-  input.focus();
+  try {
+    await add(value);
+  } finally {
+    input.disabled = false;
+    input.focus();
+    submitInFlight = false;
+  }
 });
 
 clearBtn.addEventListener('click', () => {
-  if (entries.length === 0) return;
-  if (!confirm('모든 항목을 지울까요?')) return;
+  if (clearBtn.disabled || entries.length === 0) return;
+  clearBtn.disabled = true;
+  const ok = confirm('모든 항목을 지울까요?');
+  if (ok) {
+    entries = [];
+    resetSettled();
+    render();
+  }
+  clearBtn.disabled = false;
+});
+
+restartBtn.addEventListener('click', () => {
+  if (restartBtn.disabled) return;
+  restartBtn.disabled = true;
   entries = [];
   resetSettled();
   render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  input.focus();
+});
+
+translateToggle.addEventListener('click', () => {
+  const expanded = footerNoteKo.classList.toggle('shown');
+  translateToggle.textContent = expanded ? '번역 닫기' : '번역 보기';
+  if (expanded) scrollIfHidden(footerNoteKo);
 });
 
 settleBtn.addEventListener('click', () => {
@@ -397,11 +447,12 @@ settleBtn.addEventListener('click', () => {
     showToast('감사한 일을 적어보세요');
     return;
   }
-  // 이미 결산 진행 중이거나 끝난 상태면 중복 실행 방지
-  if (itemsEl.querySelector('.amt.shown')) return;
+  // 이중 가드: 비활성화 상태 또는 이미 진행 중이면 무시
+  if (settleBtn.disabled || itemsEl.querySelector('.amt.shown')) return;
+  settleBtn.disabled = true;
 
   const perItemDelay = 450;                // amount 항목당 표시 간격
-  const TOTAL_DELAY_AFTER_LAST = 1000;     // 마지막 amount → TOTAL 등장 대기
+  const TOTAL_DELAY_AFTER_LAST = 500;      // 마지막 amount → TOTAL 등장 대기
   const TOTAL_ANIM_MS = 2700;              // TOTAL 카운트다운 길이
   const FOOTER_DELAY_AFTER_TOTAL = 2000;   // TOTAL 안착 후 → 하단 문구 대기
 
