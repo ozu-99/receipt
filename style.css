@@ -518,15 +518,32 @@ body.kb-open .receipt::-webkit-scrollbar {
   max-height: none;
   height: auto;
   overflow: visible;
-  --ink: #000000;
-  --ink-soft: #000000;
-  color: #000000;
 }
 
-/* Countdown 강조 파란색도 캡처 시엔 검정으로 통일 */
-.receipt.capture-mode .items .item .desc .cd-word {
-  color: #000000;
+/* html2canvas가 CSS 변수(var(--ink))를 잘 못 읽어서, 캡처 시엔 모든 글자 색을 직접 검정으로 지정 */
+.receipt.capture-mode,
+.receipt.capture-mode .sub,
+.receipt.capture-mode .cols,
+.receipt.capture-mode .c-qty,
+.receipt.capture-mode .c-desc,
+.receipt.capture-mode .c-amt,
+.receipt.capture-mode .items,
+.receipt.capture-mode .items .item,
+.receipt.capture-mode .items .item .qty,
+.receipt.capture-mode .items .item .desc,
+.receipt.capture-mode .items .item .desc .cd-word,
+.receipt.capture-mode .items .item .amt,
+.receipt.capture-mode .items .item .amt-val,
+.receipt.capture-mode .total,
+.receipt.capture-mode .total span,
+.receipt.capture-mode .footer-note,
+.receipt.capture-mode .qr-label,
+.receipt.capture-mode .brand,
+.receipt.capture-mode .brand .always {
+  color: #000000 !important;
 }
+
+/* SERVER, VISIT 버튼은 검정 배경 + 흰 글자라서 글자색 그대로 유지(흰색) */
 
 .qr-box {
   display: inline-block;

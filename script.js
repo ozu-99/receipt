@@ -655,9 +655,10 @@ settleBtn.addEventListener('click', () => {
   );
 });
 
-// SAVE AS IMAGE — receipt를 PNG로 캡처해서 다운로드
+// SAVE AS IMAGE — receipt를 PNG로 캡처해서 다운로드 (modern-screenshot 사용)
 saveBtn.addEventListener('click', async () => {
-  if (typeof html2canvas !== 'function') {
+  const ms = window.modernScreenshot;
+  if (!ms || typeof ms.domToBlob !== 'function') {
     showToast('이미지 라이브러리 로딩 실패');
     return;
   }
@@ -666,29 +667,36 @@ saveBtn.addEventListener('click', async () => {
   saveBtn.disabled = true;
   // 캡처 모드 ON → VISIT/SAVE 자리에 QR 코드 노출
   receiptEl.classList.add('capture-mode');
-  receiptEl.scrollTop = 0; // 콘텐츠가 위에서부터 배치되도록
-  // 브라우저가 capture-mode 스타일을 적용할 시간 확보 (2 프레임 대기)
+  receiptEl.scrollTop = 0;
+  // VISIT/SAVE 버튼은 캡처에서 제외하기 위해 임시로 data-attr 표시
+  visitBtn.setAttribute('data-capture-skip', '');
+  saveBtn.setAttribute('data-capture-skip', '');
+  // 폰트(Courier Prime 등)가 완전히 로드된 뒤에 캡처
+  if (document.fonts && document.fonts.ready) {
+    try { await document.fonts.ready; } catch (_) {}
+  }
   await new Promise((r) =>
     requestAnimationFrame(() => requestAnimationFrame(r))
   );
   try {
-    // capture-mode가 receipt를 content 전체 크기로 펼쳐놓아서 width/height 옵션 없이도 OK
-    // 페이지가 스크롤되어 있으면 capture 좌표 보정
-    const canvas = await html2canvas(receiptEl, {
-      backgroundColor: '#fafaf6',
+    const blob = await ms.domToBlob(receiptEl, {
+      type: 'image/png',
       scale: 3,
-      useCORS: true,
-      logging: false,
-      scrollX: 0,
-      scrollY: -window.scrollY,
-      letterRendering: true,       // 글자 단위 렌더링 (색/형태 정확도 ↑)
-      foreignObjectRendering: false, // 호환성 우선 (SVG 기반은 일부 환경에서 텍스트 누락)
-      imageTimeout: 0,
-      ignoreElements: (el) => el === visitBtn || el === saveBtn,
+      backgroundColor: '#fafaf6',
+      filter: (node) => {
+        // VISIT/SAVE 버튼 제외
+        if (node && node.getAttribute && node.getAttribute('data-capture-skip') !== null) {
+          return false;
+        }
+        return true;
+      },
+      style: {
+        // 캡처되는 receipt 자체에 직접 스타일 박기 — 글자색 강제 검정
+        color: '#000000',
+      },
     });
 
     const fileName = `receipt-${Date.now()}.png`;
-    const blob = await new Promise((r) => canvas.toBlob(r, 'image/png'));
 
     // 모바일(iOS/Android): Web Share API → 네이티브 공유시트("이미지 저장" 가능)
     if (blob && navigator.share && navigator.canShare) {
@@ -705,19 +713,22 @@ saveBtn.addEventListener('click', async () => {
     }
 
     // 데스크탑: 다운로드 링크
-    const url = blob ? URL.createObjectURL(blob) : canvas.toDataURL('image/png');
+    if (!blob) throw new Error('blob 생성 실패');
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.download = fileName;
     link.href = url;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    if (blob) setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   } catch (err) {
     console.error(err);
     showToast('저장 실패. 다시 시도해주세요.');
   } finally {
     receiptEl.classList.remove('capture-mode');
+    visitBtn.removeAttribute('data-capture-skip');
+    saveBtn.removeAttribute('data-capture-skip');
     saveBtn.textContent = prev;
     saveBtn.disabled = false;
   }
