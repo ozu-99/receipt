@@ -519,7 +519,7 @@ body.kb-open .receipt::-webkit-scrollbar {
   height: auto;
   overflow: visible;
   --ink: #000000;
-  --ink-soft: #1a1a1a;
+  --ink-soft: #000000;
 }
 
 .qr-box {
