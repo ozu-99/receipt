@@ -436,25 +436,6 @@ body.kb-open .receipt::-webkit-scrollbar {
   color: var(--ink);
 }
 
-/* RESTART (마지막 단계 — CLEAR 버튼과 같은 작은 텍스트 링크 서식) */
-.restart-btn {
-  margin-top: 10px;
-  padding: 6px 0;
-  background: none;
-  border: none;
-  color: var(--ink-soft);
-  font-family: inherit;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 3px;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.restart-btn:hover {
-  background: none;
-  color: var(--ink);
-}
 
 .footer-note .cursor {
   display: inline-block;

@@ -54,7 +54,6 @@ const footerNoteEl = receiptEl.querySelector('.footer-note');
 const footerNoteOriginalHTML = footerNoteEl.innerHTML;
 const totalAmountEl = document.getElementById('total-amount');
 const visitBtn = document.getElementById('visit-btn');
-const restartBtn = document.getElementById('restart-btn');
 
 
 // money 효과음 (TOTAL $0.00 안착 시 1회 재생)
@@ -131,13 +130,6 @@ function typeFooterNote(perChar = 55) {
           visitBtn.classList.add('shown');
           scrollReceiptToBottom();
         }, 2000)
-      );
-      // 그 1초 뒤 → Restart 버튼 등장
-      revealTimers.push(
-        setTimeout(() => {
-          restartBtn.classList.add('shown');
-          scrollReceiptToBottom();
-        }, 3000)
       );
       return;
     }
@@ -512,14 +504,12 @@ function resetSettled() {
   form.classList.remove('hidden-confirm');
   clearRevealTimers();
   settleBtn.disabled = false;
-  restartBtn.disabled = false;
   // footer 텍스트도 원본으로 복구 (다음 결산 시 다시 타이핑됨)
   footerNoteEl.innerHTML = footerNoteOriginalHTML;
   // total 금액도 초기값으로
   totalAmountEl.textContent = '$0.00';
-  // visit / restart 버튼 숨김
+  // visit 버튼 숨김
   visitBtn.classList.remove('shown');
-  restartBtn.classList.remove('shown');
 }
 
 let submitInFlight = false;
@@ -563,17 +553,6 @@ clearBtn.addEventListener('click', () => {
   }
   clearBtn.disabled = false;
 });
-
-restartBtn.addEventListener('click', () => {
-  if (restartBtn.disabled) return;
-  restartBtn.disabled = true;
-  entries = [];
-  resetSettled();
-  render();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  input.focus();
-});
-
 
 settleBtn.addEventListener('click', () => {
   if (entries.length === 0) {
