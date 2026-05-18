@@ -3,23 +3,22 @@ const input = document.getElementById('desc');
 
 // 모바일 키보드 올라올 때 입력창(composer)을 visualViewport 하단에 고정
 // (interactive-widget=resizes-content를 지원 안 하는 iOS Safari 등 폴백)
+let isKeyboardOpen = false;
+
 if (window.visualViewport) {
-  let kbWasOpen = false;
   const updateComposerOffset = () => {
     const vv = window.visualViewport;
     const keyboardOffset = window.innerHeight - vv.height - vv.offsetTop;
     const offset = Math.max(0, keyboardOffset);
     document.documentElement.style.setProperty('--kb-offset', `${offset}px`);
-    // stage 높이를 visualViewport 높이로 → 키보드 열려도 receipt가 보이는 영역 안에 위치
     document.documentElement.style.setProperty('--stage-h', `${vv.height}px`);
 
-    // 키보드 열림/닫힘 감지 (100px 이상이면 열림으로 간주)
-    if (offset > 100) {
-      kbWasOpen = true;
-    } else if (kbWasOpen && offset < 50) {
-      // 키보드가 막 닫혔다 → items translate 초기화해서 누적된 모든 항목 보이게
-      kbWasOpen = false;
-      if (typeof resetItemsShift === 'function') resetItemsShift();
+    // 키보드 열림/닫힘 → body 클래스로 모드 전환
+    const open = offset > 100;
+    if (open !== isKeyboardOpen) {
+      isKeyboardOpen = open;
+      document.body.classList.toggle('kb-open', open);
+      if (!open && typeof resetItemsShift === 'function') resetItemsShift();
     }
   };
   window.visualViewport.addEventListener('resize', updateComposerOffset);
@@ -269,30 +268,20 @@ function hasKorean(text) {
   return /[ㄱ-힝]/.test(text);
 }
 
-// items의 translateY 누적값 — 각 새 항목마다 한 항목 높이만큼 추가
-let itemsShift = 0;
-
-function applyItemsShift() {
-  itemsEl.style.transform = itemsShift > 0 ? `translateY(-${itemsShift}px)` : '';
-}
-
+// (translate 효과 제거됨)
 function resetItemsShift() {
-  itemsShift = 0;
-  applyItemsShift();
+  itemsEl.style.transform = '';
 }
 
-// 2번째 항목부터 — items 영역을 시각적으로 위로 translate해서 "스크롤 효과" 흉내
+// 새 항목 입력 시 — 키보드 열린 상태에서만 새 항목으로 스크롤
+// (키보드 닫혔으면 전체 영수증 자유 스크롤 모드라 자동 스크롤 안 함)
 function scrollToNewItem() {
-  if (entries.length <= 1) {
-    resetItemsShift();
-    return;
-  }
+  if (!isKeyboardOpen) return;
   requestAnimationFrame(() => {
     const items = itemsEl.querySelectorAll('.item');
     const lastItem = items[items.length - 1];
     if (!lastItem) return;
-    itemsShift += lastItem.offsetHeight;
-    applyItemsShift();
+    lastItem.scrollIntoView({ behavior: 'smooth', block: 'end' });
   });
 }
 

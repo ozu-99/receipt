@@ -29,34 +29,51 @@ body {
   font-family: 'Courier Prime', 'Courier New', monospace;
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
-  /* 배경 스크롤 비활성화 — 영수증 내부에서만 스크롤 */
+  overflow-x: hidden;
+}
+
+/* 키보드 닫혔을 때: 페이지 자유 스크롤로 영수증 전체 확인 가능
+   키보드 열렸을 때: kb-open 클래스가 body에 붙어서 스크롤 잠금 + 영수증 컴팩트화 */
+body.kb-open {
   overflow: hidden;
+  height: var(--stage-h, 100vh);
 }
 
 .stage {
-  /* 키보드가 열리면 --stage-h(visualViewport 높이)로 줄어 receipt가 키보드 위에 위치 */
-  height: var(--stage-h, 100vh);
+  min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   padding: 48px 16px 120px;
+}
+
+body.kb-open .stage {
+  min-height: 0;
+  height: var(--stage-h, 100vh);
+  align-items: center;
   overflow: hidden;
-  transition: height 0.2s ease-out;
 }
 
 /* ---------- Receipt paper ---------- */
-/* back.png 비율(417:1171)에 맞춘 박스. 이미지가 박스를 정확히 채움 */
+/* back.png 비율(417:1171)에 맞춘 박스. 키보드 닫힘 시 자연 크기 (긴 영수증), 키보드 열림 시 stage에 맞춤 */
 .receipt {
   position: relative;
   width: 100%;
   max-width: 360px;
-  max-height: 100%;
   aspect-ratio: 417 / 1171;
   padding: 56px 44px 64px;
   background: url('back.png') no-repeat center / 100% 100%;
-  /* 영수증 내부 스크롤 (세로/가로 모두 허용) */
-  overflow: auto;
-  scrollbar-width: none; /* Firefox */
+  overflow: hidden;
+}
+
+body.kb-open .receipt {
+  max-height: 100%;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+body.kb-open .receipt::-webkit-scrollbar {
+  display: none;
 }
 
 .receipt::-webkit-scrollbar {
@@ -182,18 +199,10 @@ body {
 }
 
 /* ---------- Items ---------- */
-/* mask: translate된 items가 위(cols 헤더)나 아래로 빠져나가지 않게 잘라냄 */
-.items-mask {
-  overflow: hidden;
-}
-
 .items {
   list-style: none;
   padding: 10px 0 6px;
   min-height: 40px;
-  /* scroll-효과 시뮬레이션 (translateY) 부드럽게 */
-  transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
-  will-change: transform;
 }
 
 .items .item {
@@ -460,13 +469,10 @@ body {
   width: min(420px, calc(100% - 32px));
   display: flex;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  padding: 10px;
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
   z-index: 900;
 }
 
