@@ -169,7 +169,7 @@ function typeFooterNote(perChar = 55) {
         setTimeout(() => {
           saveBtn.classList.add('shown');
           scrollReceiptToBottom();
-        }, 3000)
+        }, 5000)
       );
       return;
     }
