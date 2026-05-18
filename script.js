@@ -4,13 +4,21 @@ const input = document.getElementById('desc');
 // 모바일 키보드 올라올 때 입력창(composer)을 visualViewport 하단에 고정
 // (interactive-widget=resizes-content를 지원 안 하는 iOS Safari 등 폴백)
 if (window.visualViewport) {
+  let kbWasOpen = false;
   const updateComposerOffset = () => {
     const vv = window.visualViewport;
     const keyboardOffset = window.innerHeight - vv.height - vv.offsetTop;
-    document.documentElement.style.setProperty(
-      '--kb-offset',
-      `${Math.max(0, keyboardOffset)}px`
-    );
+    const offset = Math.max(0, keyboardOffset);
+    document.documentElement.style.setProperty('--kb-offset', `${offset}px`);
+
+    // 키보드 열림/닫힘 감지 (100px 이상이면 열림으로 간주)
+    if (offset > 100) {
+      kbWasOpen = true;
+    } else if (kbWasOpen && offset < 50) {
+      // 키보드가 막 닫혔다 → items translate 초기화해서 누적된 모든 항목 보이게
+      kbWasOpen = false;
+      if (typeof resetItemsShift === 'function') resetItemsShift();
+    }
   };
   window.visualViewport.addEventListener('resize', updateComposerOffset);
   window.visualViewport.addEventListener('scroll', updateComposerOffset);
@@ -247,19 +255,30 @@ function hasKorean(text) {
   return /[ㄱ-힝]/.test(text);
 }
 
+// items의 translateY 누적값 — 각 새 항목마다 한 항목 높이만큼 추가
+let itemsShift = 0;
+
+function applyItemsShift() {
+  itemsEl.style.transform = itemsShift > 0 ? `translateY(-${itemsShift}px)` : '';
+}
+
+function resetItemsShift() {
+  itemsShift = 0;
+  applyItemsShift();
+}
+
 // 2번째 항목부터 — items 영역을 시각적으로 위로 translate해서 "스크롤 효과" 흉내
-// (overflow가 없어도 항상 움직임이 보이고 새 항목이 사용자 시선에 들어옴)
 function scrollToNewItem() {
   if (entries.length <= 1) {
-    itemsEl.style.transform = '';
+    resetItemsShift();
     return;
   }
   requestAnimationFrame(() => {
     const items = itemsEl.querySelectorAll('.item');
     const lastItem = items[items.length - 1];
     if (!lastItem) return;
-    const shift = (entries.length - 1) * lastItem.offsetHeight;
-    itemsEl.style.transform = `translateY(-${shift}px)`;
+    itemsShift += lastItem.offsetHeight;
+    applyItemsShift();
   });
 }
 
@@ -480,7 +499,7 @@ function clearRevealTimers() {
 function resetSettled() {
   receiptEl.classList.remove('settling', 'settled', 'settled-final');
   itemsEl.querySelectorAll('.amt.shown').forEach((el) => el.classList.remove('shown'));
-  itemsEl.style.transform = '';
+  resetItemsShift();
   clearRevealTimers();
   settleBtn.disabled = false;
   restartBtn.disabled = false;
