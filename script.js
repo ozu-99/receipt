@@ -670,12 +670,15 @@ saveBtn.addEventListener('click', async () => {
     // capture-mode가 receipt를 content 전체 크기로 펼쳐놓아서 width/height 옵션 없이도 OK
     // 페이지가 스크롤되어 있으면 capture 좌표 보정
     const canvas = await html2canvas(receiptEl, {
-      backgroundColor: '#fafaf6', // 종이 배경색 (투명 NG — 환경별 색 변동 방지)
-      scale: 3, // 더 선명하게
+      backgroundColor: '#fafaf6',
+      scale: 3,
       useCORS: true,
       logging: false,
       scrollX: 0,
       scrollY: -window.scrollY,
+      letterRendering: true,       // 글자 단위 렌더링 (색/형태 정확도 ↑)
+      foreignObjectRendering: false, // 호환성 우선 (SVG 기반은 일부 환경에서 텍스트 누락)
+      imageTimeout: 0,
       ignoreElements: (el) => el === visitBtn || el === saveBtn,
     });
 
