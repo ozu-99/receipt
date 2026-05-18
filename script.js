@@ -280,9 +280,9 @@ function scrollToNewItem() {
     const items = itemsEl.querySelectorAll('.item');
     const lastItem = items[items.length - 1];
     if (!lastItem) return;
-    const gap = 2; // 항목 사이 공백
+    // 항목 높이의 절반만큼만 살짝 스크롤 (덜 과한 움직임)
     receiptEl.scrollBy({
-      top: lastItem.offsetHeight + gap,
+      top: lastItem.offsetHeight * 0.5,
       behavior: 'smooth',
     });
   });
