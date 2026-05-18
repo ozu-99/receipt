@@ -79,8 +79,8 @@ function animateTotalAmount(duration = 1500) {
   // 즉시 9999.99 표시 (대기 시작)
   totalAmountEl.textContent = '$' + startValue.toFixed(2);
 
-  // 효과음은 전체 안착 0.2초 전 (= duration - 200)
-  revealTimers.push(setTimeout(playMoneySound, Math.max(0, duration - 200)));
+  // 효과음은 전체 안착 0.7초 전 (= duration - 700)
+  revealTimers.push(setTimeout(playMoneySound, Math.max(0, duration - 700)));
 
   // 0.2초 대기 후 카운트다운 시작
   revealTimers.push(
