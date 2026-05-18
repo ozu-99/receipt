@@ -180,10 +180,18 @@ body {
 }
 
 /* ---------- Items ---------- */
+/* mask: translate된 items가 위(cols 헤더)나 아래로 빠져나가지 않게 잘라냄 */
+.items-mask {
+  overflow: hidden;
+}
+
 .items {
   list-style: none;
   padding: 10px 0 6px;
   min-height: 40px;
+  /* scroll-효과 시뮬레이션 (translateY) 부드럽게 */
+  transition: transform 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: transform;
 }
 
 .items .item {

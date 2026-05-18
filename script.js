@@ -247,15 +247,19 @@ function hasKorean(text) {
   return /[ㄱ-힝]/.test(text);
 }
 
-// 2번째 항목부터 — 추가되는 항목 높이만큼 receipt 내부를 아래로 스크롤
-// (첫 항목은 헤더 고정 유지)
+// 2번째 항목부터 — items 영역을 시각적으로 위로 translate해서 "스크롤 효과" 흉내
+// (overflow가 없어도 항상 움직임이 보이고 새 항목이 사용자 시선에 들어옴)
 function scrollToNewItem() {
-  if (entries.length <= 1) return;
+  if (entries.length <= 1) {
+    itemsEl.style.transform = '';
+    return;
+  }
   requestAnimationFrame(() => {
     const items = itemsEl.querySelectorAll('.item');
     const lastItem = items[items.length - 1];
     if (!lastItem) return;
-    receiptEl.scrollBy({ top: lastItem.offsetHeight, behavior: 'smooth' });
+    const shift = (entries.length - 1) * lastItem.offsetHeight;
+    itemsEl.style.transform = `translateY(-${shift}px)`;
   });
 }
 
@@ -476,6 +480,7 @@ function clearRevealTimers() {
 function resetSettled() {
   receiptEl.classList.remove('settling', 'settled', 'settled-final');
   itemsEl.querySelectorAll('.amt.shown').forEach((el) => el.classList.remove('shown'));
+  itemsEl.style.transform = '';
   clearRevealTimers();
   settleBtn.disabled = false;
   restartBtn.disabled = false;
