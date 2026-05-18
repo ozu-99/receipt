@@ -10,6 +10,8 @@ if (window.visualViewport) {
     const keyboardOffset = window.innerHeight - vv.height - vv.offsetTop;
     const offset = Math.max(0, keyboardOffset);
     document.documentElement.style.setProperty('--kb-offset', `${offset}px`);
+    // stage 높이를 visualViewport 높이로 → 키보드 열려도 receipt가 보이는 영역 안에 위치
+    document.documentElement.style.setProperty('--stage-h', `${vv.height}px`);
 
     // 키보드 열림/닫힘 감지 (100px 이상이면 열림으로 간주)
     if (offset > 100) {

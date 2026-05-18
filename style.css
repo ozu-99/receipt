@@ -34,12 +34,14 @@ body {
 }
 
 .stage {
-  height: 100vh;
+  /* 키보드가 열리면 --stage-h(visualViewport 높이)로 줄어 receipt가 키보드 위에 위치 */
+  height: var(--stage-h, 100vh);
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 48px 16px 120px;
   overflow: hidden;
+  transition: height 0.2s ease-out;
 }
 
 /* ---------- Receipt paper ---------- */
