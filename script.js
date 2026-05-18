@@ -671,7 +671,7 @@ saveBtn.addEventListener('click', async () => {
     // 페이지가 스크롤되어 있으면 capture 좌표 보정
     const canvas = await html2canvas(receiptEl, {
       backgroundColor: '#fafaf6',
-      scale: 3,
+      scale: 2,
       useCORS: true,
       logging: false,
       scrollX: 0,
