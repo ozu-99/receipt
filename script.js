@@ -273,15 +273,18 @@ function resetItemsShift() {
   itemsEl.style.transform = '';
 }
 
-// 새 항목 입력 시 — 키보드 열린 상태에서만 새 항목으로 스크롤
-// (키보드 닫혔으면 전체 영수증 자유 스크롤 모드라 자동 스크롤 안 함)
+// 새 항목 입력 시 — 키보드 열린 상태에서만 receipt를 (항목 높이 + 공백) 만큼 아래로 스크롤
 function scrollToNewItem() {
   if (!isKeyboardOpen) return;
   requestAnimationFrame(() => {
     const items = itemsEl.querySelectorAll('.item');
     const lastItem = items[items.length - 1];
     if (!lastItem) return;
-    lastItem.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    const gap = 8; // 항목 사이 공백
+    receiptEl.scrollBy({
+      top: lastItem.offsetHeight + gap,
+      behavior: 'smooth',
+    });
   });
 }
 
