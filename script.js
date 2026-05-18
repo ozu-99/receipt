@@ -241,10 +241,9 @@ function render() {
       </li>`
     )
     .join('');
-  // 항목이 하나도 없으면 CONFIRM / RESTART 버튼 둘 다 숨김
-  const empty = entries.length === 0;
-  settleBtn.classList.toggle('hidden-empty', empty);
-  clearBtn.classList.toggle('hidden-empty', empty);
+  // CONFIRM은 항목 3개 이상부터, CLEAR는 항목이 1개라도 있을 때 표시
+  settleBtn.classList.toggle('hidden-empty', entries.length < 3);
+  clearBtn.classList.toggle('hidden-empty', entries.length === 0);
   // 자동 스크롤 제거 — 사용자가 화면 첫 부분을 그대로 볼 수 있게
 }
 
