@@ -468,6 +468,11 @@ body {
   z-index: 900;
 }
 
+/* CONFIRM 이후 입력창 숨김 */
+.composer.hidden-confirm {
+  display: none;
+}
+
 .composer input {
   flex: 1;
   height: 38px;

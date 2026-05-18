@@ -128,14 +128,14 @@ function typeFooterNote(perChar = 55) {
       revealTimers.push(
         setTimeout(() => {
           visitBtn.classList.add('shown');
-          scrollIfHidden(visitBtn);
+          scrollReceiptToBottom();
         }, 2000)
       );
       // 그 1초 뒤 → Restart 버튼 등장
       revealTimers.push(
         setTimeout(() => {
           restartBtn.classList.add('shown');
-          scrollIfHidden(restartBtn);
+          scrollReceiptToBottom();
         }, 3000)
       );
       return;
@@ -143,7 +143,12 @@ function typeFooterNote(perChar = 55) {
     const ch = text[i++];
     const node = ch === '\n' ? document.createElement('br') : document.createTextNode(ch);
     footerNoteEl.insertBefore(node, cursor);
-    scrollIfHidden(cursor);
+    // settle 이후엔 receipt를 항상 맨 아래로 고정
+    if (receiptEl.classList.contains('settling') || receiptEl.classList.contains('settled')) {
+      scrollReceiptToBottom();
+    } else {
+      scrollIfHidden(cursor);
+    }
 
     // 한 콘텐츠 줄이 끝나는 시점(= 다음이 \n)이면 PAUSE
     const next = text[i];
@@ -164,6 +169,13 @@ function scrollIfHidden(el) {
   if (rect.bottom > visibleBottom) {
     window.scrollBy({ top: rect.bottom - visibleBottom + 8, behavior: 'smooth' });
   }
+}
+
+// receipt 내부 스크롤을 강제로 맨 아래로 이동 (CONFIRM 이후 view 고정용)
+function scrollReceiptToBottom() {
+  requestAnimationFrame(() => {
+    receiptEl.scrollTo({ top: receiptEl.scrollHeight, behavior: 'smooth' });
+  });
 }
 
 let toastTimer = null;
@@ -500,6 +512,8 @@ function resetSettled() {
   receiptEl.classList.remove('settling', 'settled', 'settled-final');
   itemsEl.querySelectorAll('.amt.shown').forEach((el) => el.classList.remove('shown'));
   resetItemsShift();
+  // 입력창 복구
+  form.classList.remove('hidden-confirm');
   clearRevealTimers();
   settleBtn.disabled = false;
   restartBtn.disabled = false;
@@ -581,6 +595,12 @@ settleBtn.addEventListener('click', () => {
 
   // 버튼 즉시 사라짐 → 그 다음 amount 애니메이션 시작
   receiptEl.classList.add('settling');
+  // CONFIRM 이후 입력창 숨김
+  form.classList.add('hidden-confirm');
+  input.blur();
+  // CONFIRM 누른 순간부터는 화면 하단(amount/TOTAL/footer/CTA가 등장하는 영역)을 보여줌
+  resetItemsShift();
+  scrollReceiptToBottom();
 
   const amts = itemsEl.querySelectorAll('.amt');
 
@@ -600,7 +620,7 @@ settleBtn.addEventListener('click', () => {
   revealTimers.push(
     setTimeout(() => {
       receiptEl.classList.add('settled');
-      scrollIfHidden(receiptEl.querySelector('.total'));
+      scrollReceiptToBottom();
       animateTotalAmount(TOTAL_ANIM_MS);
     }, totalAt)
   );
@@ -610,7 +630,7 @@ settleBtn.addEventListener('click', () => {
   revealTimers.push(
     setTimeout(() => {
       receiptEl.classList.add('settled-final');
-      scrollIfHidden(footerNoteEl);
+      scrollReceiptToBottom();
       typeFooterNote();
     }, footerAt)
   );
