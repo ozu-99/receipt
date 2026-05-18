@@ -17,16 +17,24 @@ if (window.visualViewport) {
   updateComposerOffset();
 }
 
-// 입력창 탭/포커스/클릭 시 → 페이지 + 영수증 모두 상단으로 고정
-// (focus만 듣면 autofocus 상태에서 첫 탭은 미작동 → click/touchstart도 같이 듣기)
-const scrollToTopSoon = () => {
-  setTimeout(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    receiptEl.scrollTo({ top: 0, behavior: 'smooth' });
-  }, 50);
+// 입력창 탭/포커스 시 → 페이지/영수증 모두 즉시 상단 고정
+// iOS는 포커스 후에도 여러 단계로 scroll-into-view를 시도하므로 0/50/150/350ms 다중 잠금
+function lockToTop() {
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+  receiptEl.scrollTop = 0;
+}
+
+const lockToTopMulti = () => {
+  lockToTop();
+  setTimeout(lockToTop, 50);
+  setTimeout(lockToTop, 150);
+  setTimeout(lockToTop, 350);
 };
+
 ['focus', 'click', 'touchstart'].forEach((evt) => {
-  input.addEventListener(evt, scrollToTopSoon, { passive: true });
+  input.addEventListener(evt, lockToTopMulti, { passive: true });
 });
 const itemsEl = document.getElementById('items');
 const clearBtn = document.getElementById('clear');
