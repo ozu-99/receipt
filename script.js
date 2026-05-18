@@ -280,7 +280,7 @@ function scrollToNewItem() {
     const items = itemsEl.querySelectorAll('.item');
     const lastItem = items[items.length - 1];
     if (!lastItem) return;
-    const gap = 8; // 항목 사이 공백
+    const gap = 2; // 항목 사이 공백
     receiptEl.scrollBy({
       top: lastItem.offsetHeight + gap,
       behavior: 'smooth',
