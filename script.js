@@ -616,7 +616,11 @@ settleBtn.addEventListener('click', () => {
   revealTimers.push(
     setTimeout(() => {
       receiptEl.classList.add('settled');
-      scrollReceiptToBottom();
+      // TOTAL이 화면 중앙에 오도록 스크롤
+      requestAnimationFrame(() => {
+        const totalEl = receiptEl.querySelector('.total');
+        if (totalEl) totalEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
       animateTotalAmount(TOTAL_ANIM_MS);
     }, totalAt)
   );
