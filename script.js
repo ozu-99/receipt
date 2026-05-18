@@ -678,10 +678,33 @@ saveBtn.addEventListener('click', async () => {
       scrollY: -window.scrollY,
       ignoreElements: (el) => el === visitBtn || el === saveBtn,
     });
+
+    const fileName = `receipt-${Date.now()}.png`;
+    const blob = await new Promise((r) => canvas.toBlob(r, 'image/png'));
+
+    // 모바일(iOS/Android): Web Share API → 네이티브 공유시트("이미지 저장" 가능)
+    if (blob && navigator.share && navigator.canShare) {
+      const file = new File([blob], fileName, { type: 'image/png' });
+      if (navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file] });
+          return;
+        } catch (e) {
+          // 사용자가 공유 취소하면 그냥 종료 (다운로드 fallback 안 함)
+          if (e && e.name === 'AbortError') return;
+        }
+      }
+    }
+
+    // 데스크탑: 다운로드 링크
+    const url = blob ? URL.createObjectURL(blob) : canvas.toDataURL('image/png');
     const link = document.createElement('a');
-    link.download = `receipt-${Date.now()}.png`;
-    link.href = canvas.toDataURL('image/png');
+    link.download = fileName;
+    link.href = url;
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
+    if (blob) setTimeout(() => URL.revokeObjectURL(url), 1000);
   } catch (err) {
     console.error(err);
     showToast('저장 실패. 다시 시도해주세요.');
