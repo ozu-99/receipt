@@ -65,7 +65,14 @@ body.kb-open .stage {
   aspect-ratio: 417 / 1171;
   padding: 56px 44px 64px;
   background: url('back.png') no-repeat center / 100% 100%;
-  overflow: hidden;
+  /* 입력 단계든 결산 단계든 receipt 내부 스크롤 항상 가능 */
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+.receipt::-webkit-scrollbar {
+  display: none;
 }
 
 body.kb-open .receipt {
