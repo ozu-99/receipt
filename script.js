@@ -566,7 +566,7 @@ settleBtn.addEventListener('click', () => {
   const perItemDelay = 450;                // amount 항목당 표시 간격
   const TOTAL_DELAY_AFTER_LAST = 500;      // 마지막 amount → TOTAL 등장 대기
   const TOTAL_ANIM_MS = 2700;              // TOTAL 카운트다운 길이
-  const FOOTER_DELAY_AFTER_TOTAL = 2000;   // TOTAL 안착 후 → 하단 문구 대기
+  const FOOTER_DELAY_AFTER_TOTAL = 1500;   // TOTAL 안착 후 → 하단 문구 대기
 
   // 버튼 즉시 사라짐 → 그 다음 amount 애니메이션 시작
   receiptEl.classList.add('settling');
