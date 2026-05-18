@@ -275,7 +275,7 @@ function resetItemsShift() {
 
 // 새 항목 입력 시
 // - 처음 3개까지: 헤더 고정 (스크롤 안 함)
-// - 4번째부터: 그 항목의 텍스트 높이만큼 receipt 아래로 스크롤
+// - 4번째부터: 항목의 텍스트 높이 + 한 줄 공백만큼 receipt 아래로 스크롤
 function scrollToNewItem() {
   if (!isKeyboardOpen) return;
   if (entries.length <= 3) return; // 1~3번째는 헤더 유지
@@ -283,8 +283,9 @@ function scrollToNewItem() {
     const items = itemsEl.querySelectorAll('.item');
     const lastItem = items[items.length - 1];
     if (!lastItem) return;
+    const lineH = parseFloat(getComputedStyle(lastItem).lineHeight) || 20;
     receiptEl.scrollBy({
-      top: lastItem.offsetHeight,
+      top: lastItem.offsetHeight + lineH,
       behavior: 'smooth',
     });
   });
