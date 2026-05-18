@@ -670,8 +670,8 @@ saveBtn.addEventListener('click', async () => {
     // capture-mode가 receipt를 content 전체 크기로 펼쳐놓아서 width/height 옵션 없이도 OK
     // 페이지가 스크롤되어 있으면 capture 좌표 보정
     const canvas = await html2canvas(receiptEl, {
-      backgroundColor: null,
-      scale: 2,
+      backgroundColor: '#000000', // 진한 검정 배경 (transparent → black)
+      scale: 3, // 더 선명하게
       useCORS: true,
       logging: false,
       scrollX: 0,
