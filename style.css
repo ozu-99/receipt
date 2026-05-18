@@ -410,8 +410,9 @@ body.kb-open .receipt::-webkit-scrollbar {
 /* Visit Countdown 2026 버튼 — footer 타이핑 후 등장 (검정 박스) */
 .visit-btn {
   display: none;
-  width: 100%;
-  margin-top: 20px;
+  /* receipt 안쪽 padding 영역 양쪽으로 살짝 확장 */
+  width: calc(100% + 30px);
+  margin: 20px -15px 0;
   padding: 12px 0;
   border: 1px solid var(--ink);
   background: var(--ink);
