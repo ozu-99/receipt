@@ -56,12 +56,10 @@ const totalAmountEl = document.getElementById('total-amount');
 const visitBtn = document.getElementById('visit-btn');
 
 
-// money 효과음 (TOTAL $0.00 안착 시 1회 재생)
-const moneyPrototype = new Audio('money.m4a');
-moneyPrototype.preload = 'auto';
+// money 효과음 — 매 호출마다 새 Audio 인스턴스 (이전 재생 상태와 무관하게 매번 새로 재생)
 function playMoneySound() {
   try {
-    const s = moneyPrototype.cloneNode();
+    const s = new Audio('money.m4a');
     s.volume = 0.7;
     s.play().catch(() => {});
   } catch (e) {
