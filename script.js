@@ -17,12 +17,15 @@ if (window.visualViewport) {
   updateComposerOffset();
 }
 
-// 입력창 탭/포커스 시 → 화면 상단으로 스크롤 (iOS의 기본 scroll-into-view 동작 덮어쓰기)
-input.addEventListener('focus', () => {
-  // iOS Safari가 기본 스크롤을 먼저 실행하므로 짧은 지연 후 강제 상단 이동
+// 입력창 탭/포커스/클릭 시 → 화면 상단으로 스크롤
+// (focus만 듣면 autofocus 상태에서 첫 탭은 focus 이벤트가 안 떠서 미작동 → click/touchstart도 같이 듣기)
+const scrollToTopSoon = () => {
   setTimeout(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, 50);
+};
+['focus', 'click', 'touchstart'].forEach((evt) => {
+  input.addEventListener(evt, scrollToTopSoon, { passive: true });
 });
 const itemsEl = document.getElementById('items');
 const clearBtn = document.getElementById('clear');
