@@ -74,12 +74,6 @@ body.kb-open .receipt {
   scrollbar-width: none;
 }
 
-/* 결산 완료(VISIT 등장 시점) — aspect-ratio 풀어서 content 길이로 받침 */
-.receipt.settled-final {
-  aspect-ratio: auto;
-  padding-bottom: 0.5cm;
-}
-
 body.kb-open .receipt::-webkit-scrollbar {
   display: none;
 }
