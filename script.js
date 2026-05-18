@@ -17,11 +17,12 @@ if (window.visualViewport) {
   updateComposerOffset();
 }
 
-// 입력창 탭/포커스/클릭 시 → 화면 상단으로 스크롤
-// (focus만 듣면 autofocus 상태에서 첫 탭은 focus 이벤트가 안 떠서 미작동 → click/touchstart도 같이 듣기)
+// 입력창 탭/포커스/클릭 시 → 페이지 + 영수증 모두 상단으로 고정
+// (focus만 듣면 autofocus 상태에서 첫 탭은 미작동 → click/touchstart도 같이 듣기)
 const scrollToTopSoon = () => {
   setTimeout(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    receiptEl.scrollTo({ top: 0, behavior: 'smooth' });
   }, 50);
 };
 ['focus', 'click', 'touchstart'].forEach((evt) => {
