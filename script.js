@@ -7,7 +7,6 @@ if (window.visualViewport) {
   const updateComposerOffset = () => {
     const vv = window.visualViewport;
     const keyboardOffset = window.innerHeight - vv.height - vv.offsetTop;
-    // CSS 변수로 노출 → composer가 bottom 계산에 활용
     document.documentElement.style.setProperty(
       '--kb-offset',
       `${Math.max(0, keyboardOffset)}px`
@@ -17,6 +16,14 @@ if (window.visualViewport) {
   window.visualViewport.addEventListener('scroll', updateComposerOffset);
   updateComposerOffset();
 }
+
+// 입력창 탭/포커스 시 → 화면 상단으로 스크롤 (iOS의 기본 scroll-into-view 동작 덮어쓰기)
+input.addEventListener('focus', () => {
+  // iOS Safari가 기본 스크롤을 먼저 실행하므로 짧은 지연 후 강제 상단 이동
+  setTimeout(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 50);
+});
 const itemsEl = document.getElementById('items');
 const clearBtn = document.getElementById('clear');
 const settleBtn = document.getElementById('settle');
