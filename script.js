@@ -158,13 +158,18 @@ function typeFooterNote(perChar = 55) {
     if (i >= text.length) {
       // 마지막 글자 입력 후 커서 1번 정도 깜빡 (0.8초) 뒤 제거
       revealTimers.push(setTimeout(() => cursor.remove(), 800));
-      // 2초 뒤 → Visit + Save 버튼 등장
+      // 2초 뒤 → Visit 버튼 등장, 그 1초 뒤 → Save 버튼 등장
       revealTimers.push(
         setTimeout(() => {
           visitBtn.classList.add('shown');
-          saveBtn.classList.add('shown');
           scrollReceiptToBottom();
         }, 2000)
+      );
+      revealTimers.push(
+        setTimeout(() => {
+          saveBtn.classList.add('shown');
+          scrollReceiptToBottom();
+        }, 3000)
       );
       return;
     }
