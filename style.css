@@ -59,7 +59,7 @@ body.kb-open .stage {
 .receipt {
   position: relative;
   width: 100%;
-  max-width: 360px;
+  max-width: 320px;
   aspect-ratio: 417 / 1171;
   padding: 56px 44px 64px;
   background: url('back.png') no-repeat center / 100% 100%;
