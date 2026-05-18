@@ -70,7 +70,7 @@ body.kb-open .stage {
   overflow-x: hidden;
   scrollbar-width: none;
   /* 첫 진입 애니메이션 — 작은 크기에서 zoom-in */
-  animation: receiptEnter 5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: receiptEnter 3s cubic-bezier(0.16, 1, 0.3, 1) both;
   transform-origin: center;
 }
 
@@ -596,7 +596,7 @@ body.kb-open .receipt::-webkit-scrollbar {
   box-shadow: none;
   z-index: 900;
   /* receipt 진입 애니메이션 후 슬라이드업 등장 */
-  animation: composerEnter 0.6s ease-out 4.5s both;
+  animation: composerEnter 0.6s ease-out 2.5s both;
 }
 
 @keyframes composerEnter {
