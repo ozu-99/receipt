@@ -247,13 +247,19 @@ function hasKorean(text) {
   return /[ㄱ-힝]/.test(text);
 }
 
-// 새 항목 추가 후 영수증을 항목 높이만큼 아래로 스크롤 (첫 항목 제외)
+// 새 항목 추가 후 — items 영역을 최신 항목까지 스크롤
 function scrollToNewItem() {
   if (entries.length <= 1) return; // 첫 항목 — 헤더 유지
-  const items = itemsEl.querySelectorAll('.item');
-  const lastItem = items[items.length - 1];
-  if (!lastItem) return;
-  receiptEl.scrollBy({ top: lastItem.offsetHeight, behavior: 'smooth' });
+  requestAnimationFrame(() => {
+    // items 영역 내부 스크롤 (모바일에서 max-height로 제한된 경우)
+    itemsEl.scrollTop = itemsEl.scrollHeight;
+    // 데스크탑에서 receipt 자체가 overflow 났을 때 대비
+    const items = itemsEl.querySelectorAll('.item');
+    const lastItem = items[items.length - 1];
+    if (lastItem) {
+      lastItem.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  });
 }
 
 // 의미있는 텍스트 판별
