@@ -456,6 +456,76 @@ body.kb-open .receipt::-webkit-scrollbar {
   color: var(--ink);
 }
 
+/* SAVE AS IMAGE 버튼 — VISIT 아래에 작은 텍스트 링크 스타일 */
+.save-btn {
+  display: none;
+  width: 100%;
+  margin-top: 10px;
+  padding: 6px 0;
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.save-btn.shown {
+  display: block;
+  animation: pop 0.4s ease-out;
+}
+
+.save-btn:hover {
+  color: var(--ink);
+}
+
+/* QR 코드 박스 — 평소엔 숨김, 이미지 저장 시(.capture-mode)에만 노출 */
+.qr-wrap {
+  display: none;
+  margin-top: 18px;
+  text-align: center;
+}
+
+.receipt.capture-mode .qr-wrap {
+  display: block;
+}
+
+/* 캡처 시엔 aspect-ratio/max-height/overflow 제약 풀어서 receipt가 content 전체 크기로 펼쳐짐 */
+.receipt.capture-mode {
+  aspect-ratio: auto;
+  max-height: none;
+  height: auto;
+  overflow: visible;
+}
+
+.qr-box {
+  display: inline-block;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+.qr-box img,
+.qr-box canvas {
+  display: block;
+  width: 90px;
+  height: 90px;
+}
+
+.qr-label {
+  margin-top: 8px;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--ink-soft);
+}
+
 
 .footer-note .cursor {
   display: inline-block;

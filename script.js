@@ -54,6 +54,42 @@ const footerNoteEl = receiptEl.querySelector('.footer-note');
 const footerNoteOriginalHTML = footerNoteEl.innerHTML;
 const totalAmountEl = document.getElementById('total-amount');
 const visitBtn = document.getElementById('visit-btn');
+const saveBtn = document.getElementById('save-btn');
+const qrBox = document.getElementById('qr-box');
+
+// QR 코드 (countdown2026.org) — canvas로 그린 뒤 PNG 데이터 URL을 <img>로 삽입
+// (html2canvas가 외부 canvas 자식보다 inline data:image/png img를 더 안정적으로 캡처)
+(function generateQR() {
+  if (typeof qrcode !== 'function' || !qrBox) return;
+  try {
+    const qr = qrcode(0, 'M');
+    qr.addData('https://www.countdown2026.org/');
+    qr.make();
+    const modules = qr.getModuleCount();
+    const cellSize = 8;            // 고해상도 (이미지 저장 시 선명)
+    const size = modules * cellSize;
+    const c = document.createElement('canvas');
+    c.width = size;
+    c.height = size;
+    const ctx = c.getContext('2d');
+    // 흰색 배경 없이 투명 — 검정 모듈만 그림
+    ctx.fillStyle = '#000000';
+    for (let r = 0; r < modules; r++) {
+      for (let cc = 0; cc < modules; cc++) {
+        if (qr.isDark(r, cc)) ctx.fillRect(cc * cellSize, r * cellSize, cellSize, cellSize);
+      }
+    }
+    const img = document.createElement('img');
+    img.src = c.toDataURL('image/png');
+    img.width = 102;
+    img.height = 102;
+    img.alt = 'QR — countdown2026.org';
+    qrBox.innerHTML = '';
+    qrBox.appendChild(img);
+  } catch (e) {
+    console.error('QR generation failed', e);
+  }
+})();
 
 
 // money 효과음 — 매 호출마다 새 Audio 인스턴스 (이전 재생 상태와 무관하게 매번 새로 재생)
@@ -122,10 +158,11 @@ function typeFooterNote(perChar = 55) {
     if (i >= text.length) {
       // 마지막 글자 입력 후 커서 1번 정도 깜빡 (0.8초) 뒤 제거
       revealTimers.push(setTimeout(() => cursor.remove(), 800));
-      // 2초 뒤 → Visit 버튼 등장
+      // 2초 뒤 → Visit + Save 버튼 등장
       revealTimers.push(
         setTimeout(() => {
           visitBtn.classList.add('shown');
+          saveBtn.classList.add('shown');
           scrollReceiptToBottom();
         }, 2000)
       );
@@ -505,8 +542,9 @@ function resetSettled() {
   footerNoteEl.innerHTML = footerNoteOriginalHTML;
   // total 금액도 초기값으로
   totalAmountEl.textContent = '$0.00';
-  // visit 버튼 숨김
+  // visit / save 버튼 숨김
   visitBtn.classList.remove('shown');
+  saveBtn.classList.remove('shown');
 }
 
 let submitInFlight = false;
@@ -610,6 +648,48 @@ settleBtn.addEventListener('click', () => {
       typeFooterNote();
     }, footerAt)
   );
+});
+
+// SAVE AS IMAGE — receipt를 PNG로 캡처해서 다운로드
+saveBtn.addEventListener('click', async () => {
+  if (typeof html2canvas !== 'function') {
+    showToast('이미지 라이브러리 로딩 실패');
+    return;
+  }
+  const prev = saveBtn.textContent;
+  saveBtn.textContent = 'SAVING...';
+  saveBtn.disabled = true;
+  // 캡처 모드 ON → VISIT/SAVE 자리에 QR 코드 노출
+  receiptEl.classList.add('capture-mode');
+  receiptEl.scrollTop = 0; // 콘텐츠가 위에서부터 배치되도록
+  // 브라우저가 capture-mode 스타일을 적용할 시간 확보 (2 프레임 대기)
+  await new Promise((r) =>
+    requestAnimationFrame(() => requestAnimationFrame(r))
+  );
+  try {
+    // capture-mode가 receipt를 content 전체 크기로 펼쳐놓아서 width/height 옵션 없이도 OK
+    // 페이지가 스크롤되어 있으면 capture 좌표 보정
+    const canvas = await html2canvas(receiptEl, {
+      backgroundColor: null,
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      scrollX: 0,
+      scrollY: -window.scrollY,
+      ignoreElements: (el) => el === visitBtn || el === saveBtn,
+    });
+    const link = document.createElement('a');
+    link.download = `receipt-${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } catch (err) {
+    console.error(err);
+    showToast('저장 실패. 다시 시도해주세요.');
+  } finally {
+    receiptEl.classList.remove('capture-mode');
+    saveBtn.textContent = prev;
+    saveBtn.disabled = false;
+  }
 });
 
 render();
