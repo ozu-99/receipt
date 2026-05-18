@@ -247,19 +247,9 @@ function hasKorean(text) {
   return /[ㄱ-힝]/.test(text);
 }
 
-// 새 항목 추가 후 — items 영역을 최신 항목까지 스크롤
+// 항목 스크롤 기능 제거 — items 자연 배치만 사용
 function scrollToNewItem() {
-  if (entries.length <= 1) return; // 첫 항목 — 헤더 유지
-  requestAnimationFrame(() => {
-    // items 영역 내부 스크롤 (모바일에서 max-height로 제한된 경우)
-    itemsEl.scrollTop = itemsEl.scrollHeight;
-    // 데스크탑에서 receipt 자체가 overflow 났을 때 대비
-    const items = itemsEl.querySelectorAll('.item');
-    const lastItem = items[items.length - 1];
-    if (lastItem) {
-      lastItem.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    }
-  });
+  // no-op
 }
 
 // 의미있는 텍스트 판별

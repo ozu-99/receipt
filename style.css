@@ -186,20 +186,6 @@ body {
   min-height: 40px;
 }
 
-/* 모바일: items 영역을 1개 항목 높이로 제한 → 2번째 항목부터 내부 스크롤 발생,
-   뷰포인트가 자연스럽게 항목 영역으로 이동하는 느낌 */
-@media (max-width: 600px) {
-  .items {
-    max-height: calc(14px * 1.45 + 20px); /* 1 item + padding */
-    overflow-y: auto;
-    overflow-x: hidden;
-    scrollbar-width: none;
-  }
-  .items::-webkit-scrollbar {
-    display: none;
-  }
-}
-
 .items .item {
   font-size: 14px;
   line-height: 1.45;
