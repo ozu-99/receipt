@@ -29,14 +29,16 @@ body {
   font-family: 'Courier Prime', 'Courier New', monospace;
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  /* 배경 스크롤 비활성화 — 영수증 내부에서만 스크롤 */
+  overflow: hidden;
 }
 
 .stage {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   justify-content: center;
-  padding: 48px 16px 160px;
+  padding: 48px 16px 120px;
+  overflow: hidden;
 }
 
 /* ---------- Receipt paper ---------- */
@@ -44,13 +46,20 @@ body {
   position: relative;
   width: 100%;
   max-width: 420px;
-  min-height: 880px;
+  max-height: 100%;
   padding: 56px 44px 64px;
   background: #fafaf6;
   box-shadow:
     0 40px 70px -15px rgba(0, 0, 0, 0.7),
     0 22px 36px -18px rgba(0, 0, 0, 0.55),
     0 0 0 1px rgba(255, 255, 255, 0.03);
+  /* 영수증 내부 콘텐츠가 넘치면 영수증만 스크롤 */
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.receipt::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
 /* highlights + soft creases (light/shadow play) */
