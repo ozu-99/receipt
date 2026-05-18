@@ -74,6 +74,18 @@ body.kb-open .receipt {
   scrollbar-width: none;
 }
 
+/* CONFIRM 이후 — receipt 내부 스크롤 활성화해서 모든 항목 + TOTAL + footer + visit 확인 가능 */
+.receipt.settling,
+.receipt.settled {
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.receipt.settling::-webkit-scrollbar,
+.receipt.settled::-webkit-scrollbar {
+  display: none;
+}
+
 body.kb-open .receipt::-webkit-scrollbar {
   display: none;
 }
