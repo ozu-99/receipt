@@ -247,6 +247,15 @@ function hasKorean(text) {
   return /[ㄱ-힝]/.test(text);
 }
 
+// 새 항목 추가 후 영수증을 항목 높이만큼 아래로 스크롤 (첫 항목 제외)
+function scrollToNewItem() {
+  if (entries.length <= 1) return; // 첫 항목 — 헤더 유지
+  const items = itemsEl.querySelectorAll('.item');
+  const lastItem = items[items.length - 1];
+  if (!lastItem) return;
+  receiptEl.scrollBy({ top: lastItem.offsetHeight, behavior: 'smooth' });
+}
+
 // 의미있는 텍스트 판별
 // - 한글 음절(가~힣) 있으면 의미있음
 // - 영어 알파벳은 단순 2자 이상으로 안 됨: 모음 + 키보드 mash 패턴 검사
@@ -381,6 +390,7 @@ async function add(text) {
     }
     entries.push({ qty: randomQty(), text: display });
     render();
+    scrollToNewItem();
     return;
   }
 
@@ -393,6 +403,7 @@ async function add(text) {
     }
     entries.push({ qty: randomQty(), text: display });
     render();
+    scrollToNewItem();
     return;
   }
 
@@ -449,6 +460,7 @@ async function add(text) {
   }
   entries.push({ qty, text: display });
   render();
+  scrollToNewItem();
 }
 
 let revealTimers = [];
