@@ -478,12 +478,13 @@ body.kb-open .receipt::-webkit-scrollbar {
   padding: 6px 0;
   background: none;
   border: none;
-  color: #c4c4c4;
+  color: #d8d8d8;
   font-family: inherit;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: 3px;
   text-decoration: underline;
+  text-decoration-color: #d8d8d8;
   text-underline-offset: 3px;
   cursor: pointer;
   transition: color 0.15s;
@@ -495,7 +496,8 @@ body.kb-open .receipt::-webkit-scrollbar {
 }
 
 .save-btn:hover {
-  color: #9a9a9a;
+  color: #a8a8a8;
+  text-decoration-color: #a8a8a8;
 }
 
 /* QR 코드 박스 — 평소엔 숨김, 이미지 저장 시(.capture-mode)에만 노출 */
