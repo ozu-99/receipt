@@ -283,9 +283,8 @@ function scrollToNewItem() {
     const items = itemsEl.querySelectorAll('.item');
     const lastItem = items[items.length - 1];
     if (!lastItem) return;
-    const lineH = parseFloat(getComputedStyle(lastItem).lineHeight) || 20;
     receiptEl.scrollBy({
-      top: lastItem.offsetHeight + lineH,
+      top: lastItem.offsetHeight,
       behavior: 'smooth',
     });
   });
