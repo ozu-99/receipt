@@ -247,9 +247,16 @@ function hasKorean(text) {
   return /[ㄱ-힝]/.test(text);
 }
 
-// 항목 스크롤 기능 제거 — items 자연 배치만 사용
+// 2번째 항목부터 — 추가되는 항목 높이만큼 receipt 내부를 아래로 스크롤
+// (첫 항목은 헤더 고정 유지)
 function scrollToNewItem() {
-  // no-op
+  if (entries.length <= 1) return;
+  requestAnimationFrame(() => {
+    const items = itemsEl.querySelectorAll('.item');
+    const lastItem = items[items.length - 1];
+    if (!lastItem) return;
+    receiptEl.scrollBy({ top: lastItem.offsetHeight, behavior: 'smooth' });
+  });
 }
 
 // 의미있는 텍스트 판별
