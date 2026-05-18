@@ -436,18 +436,24 @@ body.kb-open .receipt::-webkit-scrollbar {
   color: var(--ink);
 }
 
-/* restart 버튼은 visit-btn 바로 아래, 외곽선만 있는 모양 */
+/* RESTART (마지막 단계 — CLEAR 버튼과 같은 작은 텍스트 링크 서식) */
 .restart-btn {
   margin-top: 10px;
-  background: transparent;
-  color: var(--ink);
-  border: 1px dashed rgba(0, 0, 0, 0.45);
+  padding: 6px 0;
+  background: none;
+  border: none;
+  color: var(--ink-soft);
   font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .restart-btn:hover {
-  background: var(--ink);
-  color: var(--paper);
+  background: none;
+  color: var(--ink);
 }
 
 .footer-note .cursor {
