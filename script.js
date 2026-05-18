@@ -481,14 +481,12 @@ form.addEventListener('submit', async (e) => {
   if (!value.trim()) return;
   submitInFlight = true;
   input.value = '';
-  input.disabled = true;
-  // 새 항목이 들어오면 결산 상태를 해제 (다시 입력 가능 상태로)
+  // input.disabled = true 를 쓰지 않음 — 모바일에서 키보드가 내려가지 않도록
+  // 중복 제출은 submitInFlight 플래그로 차단
   resetSettled();
   try {
     await add(value);
   } finally {
-    input.disabled = false;
-    input.focus();
     submitInFlight = false;
   }
 });
