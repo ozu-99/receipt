@@ -520,6 +520,12 @@ body.kb-open .receipt::-webkit-scrollbar {
   overflow: visible;
   --ink: #000000;
   --ink-soft: #000000;
+  color: #000000;
+}
+
+/* Countdown 강조 파란색도 캡처 시엔 검정으로 통일 */
+.receipt.capture-mode .items .item .desc .cd-word {
+  color: #000000;
 }
 
 .qr-box {
